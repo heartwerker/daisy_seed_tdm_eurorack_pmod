@@ -4,6 +4,8 @@
 [submodule "stmlib"]
 	path = stmlib
 	url = https://github.com/pichenettes/stmlib
+	branch = master
 [submodule "libDaisy"]
 	path = libDaisy
 	url = https://github.com/heartwerker/libDaisy
+	branch = main
