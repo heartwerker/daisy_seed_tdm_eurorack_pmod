@@ -11,6 +11,8 @@
 #include "dev/codec_ak4619.h" // TODO integrate codec here directly
 #include "per/i2c.h"
 
+using namespace daisy;
+
 // ================================================================
 #define NUM_LEDS 16
 
@@ -45,8 +47,6 @@ const uint8_t led_reg_vals[] = {
 };
 
 // ================================================================
-
-using namespace daisy;
 
 class EurorackPMOD
 {

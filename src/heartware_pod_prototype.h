@@ -3,6 +3,8 @@
 
 #include "daisy_pod.h"
 
+using namespace daisy;
+
 // ================================================================
 #define ENABLE_CUSTOM_AUDIO 1
 
@@ -26,6 +28,9 @@ public:
     {
         pod.Init(boost);
 
+        pod.seed.StartLog(true); // waits until Serial Monitor is opened
+        pod.seed.PrintLine("init!");
+
 #if ENABLE_CUSTOM_AUDIO
         InitAudio();
 #endif
@@ -43,6 +48,7 @@ public:
 
     void loop() 
     {
+        pod.seed.PrintLine("loop!");
         pod.ProcessDigitalControls();
         pmod.LED_updateVU();
     }
@@ -52,13 +58,14 @@ public:
     void ProcessAnalogControls()  { pod.ProcessAnalogControls(); }
 
     // ================================================================
+#if ENABLE_CUSTOM_AUDIO
     EurorackPMOD pmod;
 
-#if ENABLE_CUSTOM_AUDIO
 private:
     // Taken from Patchset SAI2 stuff -- run this between seed configure and init
     void InitAudio()
     {
+        pod.seed.PrintLine("InitAudio");
         // Handle Seed Audio as-is and then
         SaiHandle::Config sai_config[2];
         SaiHandle sai_handle[2];
@@ -112,6 +119,7 @@ private:
 
         sai_handle[1].Init(sai_config[1]);
 #endif
+        pod.seed.PrintLine("SAI structs initialized!");
 
         I2CHandle::Config i2c_cfg;
         i2c_cfg.periph         = I2CHandle::Config::Peripheral::I2C_1;
@@ -119,10 +127,12 @@ private:
         i2c_cfg.speed          = I2CHandle::Config::Speed::I2C_400KHZ;
         i2c_cfg.pin_config.scl = seed::D11;
         i2c_cfg.pin_config.sda = seed::D12;
-        I2CHandle i2c1;
+        I2CHandle i2c1; 
         i2c1.Init(i2c_cfg);
+        pod.seed.PrintLine("I2C initialized!");
 
         pmod.Init(i2c1);
+        pod.seed.PrintLine("PMOD initialized!");
 
         // Reinit Audio for _both_ codecs...
         AudioHandle::Config cfg;
