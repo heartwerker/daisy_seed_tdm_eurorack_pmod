@@ -24,7 +24,7 @@ bool auto_toggle_audioMode = true;
 #include <cmath>
 using namespace daisy;
 #define M_TWOPI 6.28318530717958647692f
-const float kSignalIncrement = (M_TWOPI * 220) * (1.0 / 48000);
+const float kSignalIncrement = (M_TWOPI * 100) * (1.0 / 48000);
 float phs;
 
 float amplitude_increment = 0.0f;
