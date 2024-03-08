@@ -2,6 +2,7 @@
 #define HEARTDWAREPODPROTOTYPE_H
 
 #include "daisy_pod.h"
+#include "daisy.h"
 
 using namespace daisy;
 
@@ -21,6 +22,8 @@ class HeartwarePodPrototype
 public:
     daisy::DaisyPod pod;
 
+    daisy::GPIO ak4619_pdn;
+
 public:
     HeartwarePodPrototype() {}
 
@@ -28,10 +31,18 @@ public:
     {
         pod.Init(boost);
 
-        pod.seed.StartLog(true); // waits until Serial Monitor is opened
+        pod.seed.StartLog(false); // waits until Serial Monitor is opened
         pod.seed.PrintLine("init!");
+        
 
 #if ENABLE_CUSTOM_AUDIO
+
+        GPIO::Config cfg;
+        cfg.mode = GPIO::Mode::OUTPUT;
+        cfg.pin = seed::D32;
+        ak4619_pdn.Init(cfg);
+        ak4619_pdn.Write(true);
+
         InitAudio();
 #endif
     }
@@ -65,6 +76,8 @@ private:
     // Taken from Patchset SAI2 stuff -- run this between seed configure and init
     void InitAudio()
     {
+
+        
         pod.seed.PrintLine("InitAudio");
         // Handle Seed Audio as-is and then
         SaiHandle::Config sai_config[2];
@@ -108,12 +121,14 @@ private:
         sai_config[1].tdm_slots = 4;
         sai_config[1].b_sync = SaiHandle::Config::Sync::MASTER;
         sai_config[1].a_sync = SaiHandle::Config::Sync::SLAVE;
-        sai_config[1].b_dir = SaiHandle::Config::Direction::TRANSMIT;
-        sai_config[1].a_dir = SaiHandle::Config::Direction::RECEIVE;
+        sai_config[1].b_dir = SaiHandle::Config::Direction::RECEIVE;
+        sai_config[1].a_dir = SaiHandle::Config::Direction::TRANSMIT;
+        // sai_config[1].b_dir = SaiHandle::Config::Direction::TRANSMIT;
+        // sai_config[1].a_dir = SaiHandle::Config::Direction::RECEIVE;
 
         sai_config[1].pin_config.mclk = seed::D24;
-        sai_config[1].pin_config.sb = seed::D25;
-        sai_config[1].pin_config.sa = seed::D26;
+        sai_config[1].pin_config.sb = seed::D25; // Transmit
+        sai_config[1].pin_config.sa = seed::D26; // Receive
         sai_config[1].pin_config.fs = seed::D27;
         sai_config[1].pin_config.sck = seed::D28;
 
@@ -124,7 +139,8 @@ private:
         I2CHandle::Config i2c_cfg;
         i2c_cfg.periph         = I2CHandle::Config::Peripheral::I2C_1;
         i2c_cfg.mode           = I2CHandle::Config::Mode::I2C_MASTER;
-        i2c_cfg.speed          = I2CHandle::Config::Speed::I2C_400KHZ;
+        i2c_cfg.speed          = I2CHandle::Config::Speed::I2C_100KHZ;
+        // i2c_cfg.speed          = I2CHandle::Config::Speed::I2C_400KHZ;
         i2c_cfg.pin_config.scl = seed::D11;
         i2c_cfg.pin_config.sda = seed::D12;
         I2CHandle i2c1; 

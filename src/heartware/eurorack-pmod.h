@@ -11,6 +11,8 @@
 #include "dev/codec_ak4619.h" // TODO integrate codec here directly
 #include "per/i2c.h"
 
+#include "stm32h7xx_hal.h"
+
 using namespace daisy;
 
 // ================================================================
@@ -63,17 +65,19 @@ public:
     {
         i2c_ = i2c;
 
-        daisy::AK4619::Result ret = daisy::AK4619::Result::ERR;
-        while (ret != daisy::AK4619::Result::OK)
+        volatile AK4619::Result ret = AK4619::Result::ERR;
+
+        while (ret == AK4619::Result::ERR)
         {
             ret = codec.Init(i2c_);
-            if (ret == daisy::AK4619::Result::ERR)
+            if (ret == AK4619::Result::ERR)
             {
-                // blocks trying to init codec
-                System::Delay(1000);
+                System::Delay(100);
             }
+                System::Delay(10);
         }
 
+#if 0
         for (int i = 0; i < 24; i++)
         {
             uint8_t val = led_reg_vals[i];
@@ -82,10 +86,11 @@ public:
                 return Result::ERR;
             }
         }
+#endif
         return Result::OK;
     }
 
-// ================================================================
+    // ================================================================
     float max_value_in = 0;
     float max_value_out = 0;
     void AudioVUMeter(AudioHandle::InputBuffer in,
@@ -119,7 +124,7 @@ public:
         max_value_out *= 0.99999;
     }
 
-// ================================================================
+    // ================================================================
     void LED_clearAll()
     {
         for (int i = 0; i < NUM_LEDS; i++)
@@ -195,7 +200,7 @@ public:
         return Result::OK;
     }
 
-// ================================================================
+    // ================================================================
 public:
     AK4619 codec;
 

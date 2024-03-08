@@ -25,7 +25,7 @@ static void AudioCallback(AudioHandle::InputBuffer in,
 {
     for (size_t i = 0; i < size; i++)
     {
-#if 0// map all input to all output!
+#if 1 // map all input to all output!
         float mixed = 0;
         mixed += in[0][i] + in[1][i];
         mixed += in[2][i] + in[3][i] + in[4][i] + in[5][i];
